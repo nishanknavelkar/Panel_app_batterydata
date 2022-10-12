@@ -15,7 +15,7 @@ async function startApplication() {
   self.pyodide.globals.set("sendPatch", sendPatch);
   console.log("Loaded!");
   await self.pyodide.loadPackage("micropip");
-  const env_spec = ['https://cdn.holoviz.org/panel/0.14.0/dist/wheels/bokeh-2.4.3-py3-none-any.whl', 'https://cdn.holoviz.org/panel/0.14.0/dist/wheels/panel-0.14.0-py3-none-any.whl', 'pandas']
+  const env_spec = ['https://cdn.holoviz.org/panel/0.14.0/dist/wheels/bokeh-2.4.3-py3-none-any.whl', 'https://cdn.holoviz.org/panel/0.14.0/dist/wheels/panel-0.14.0-py3-none-any.whl', 'holoviews>=1.15.1', 'hvplot', 'pandas']
   for (const pkg of env_spec) {
     const pkg_name = pkg.split('/').slice(-1)[0].split('-')[0]
     self.postMessage({type: 'status', msg: `Installing ${pkg_name}`})
@@ -34,30 +34,22 @@ from panel.io.pyodide import init_doc, write_doc
 
 init_doc()
 
+import io
 import panel as pn
 import pandas as pd
+import hvplot.pandas
 
 pn.extension(sizing_mode="stretch_width", template="fast")
 pn.state.template.param.update(site="Panel in the Browser", title="EIS viewer Example")
 
-upload = pn.widgets.FileInput(name='Upload file', height=50)
+
 select = pn.widgets.Select(options={
-    'Eis': 'https://github.com/nishanknavelkar/Panel_app_batterydata/blob/main/eisdata.csv'
+    'Eis': 'https://raw.githubusercontent.com/nishanknavelkar/Panel_app_batterydata/main/eisdata.csv'
 })
 
-def add_data(event):
-    b = io.BytesIO()
-    upload.save(b)
-    b.seek(0)
-    name = '.'.join(upload.filename.split('.')[:-1])
-    select.options[name] = b
-    select.param.trigger('options')
-    select.value = b
-    
-upload.param.watch(add_data, 'filename')
 
 def explore(csv):
-    df = pd.read_csv(csv)
+    df = pd.read_csv(csv, sep=';')
     explorer = hvplot.explorer(df)
     def plot_code(**kwargs):
         code = f'\`\`\`python\\n{explorer.plot_code()}\\n\`\`\`'
@@ -71,8 +63,7 @@ def explore(csv):
 widgets = pn.Column(
     "Select an existing dataset or upload one of your own CSV files and start exploring your data.",
     pn.Row(
-        select,
-        upload,
+        select
     )
 ).servable()  
 
