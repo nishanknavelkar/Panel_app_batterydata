@@ -1,12 +1,12 @@
 import panel as pn
 import pandas as pd
+import hvplot.pandas
 
 pn.extension(sizing_mode="stretch_width", template="fast")
 pn.state.template.param.update(site="Panel in the Browser", title="EIS viewer Example")
 
-upload = pn.widgets.FileInput(name='Upload file', height=50)
 select = pn.widgets.Select(options={
-    'Eis': 'https://github.com/nishanknavelkar/Panel_app_batterydata/blob/main/eisdata.csv'
+    'Eis': 'eisdata.csv'
 })
 
 def add_data(event):
@@ -18,7 +18,6 @@ def add_data(event):
     select.param.trigger('options')
     select.value = b
     
-upload.param.watch(add_data, 'filename')
 
 def explore(csv):
     df = pd.read_csv(csv)
@@ -36,7 +35,6 @@ widgets = pn.Column(
     "Select an existing dataset or upload one of your own CSV files and start exploring your data.",
     pn.Row(
         select,
-        upload,
     )
 ).servable()  
 
