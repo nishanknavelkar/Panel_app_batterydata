@@ -8,7 +8,7 @@ pn.state.template.param.update(site="Panel in the Browser", title="EIS viewer Ex
 
 
 select = pn.widgets.Select(options={
-    'Eis': 'https://raw.githubusercontent.com/nishanknavelkar/Panel_app_batterydata/main/eisdata.csv'
+    'Eis': 'https://raw.githubusercontent.com/nishanknavelkar/Panel_app_batterydata/gh-pages/eisdata.csv'
 })
 
 
